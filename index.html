@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farewell, MattieMirakel!</title>
+  <!-- Google Serif Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-color: #f7f2e9;
+      --circle-color: rgba(240, 222, 203, 0.45);
+      --navy: #0f2444;
+      --orange: #e86339;
+      --card-bg: #fffcf8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Radial Circle Background Pattern */
+    .bg-circle {
+      position: absolute;
+      top: 55%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 700px;
+      height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--circle-color) 0%, rgba(247, 242, 233, 0) 70%);
+      border: 1px solid rgba(220, 195, 170, 0.3);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Main Container */
+    .container {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 40px;
+    }
+
+    .date-header {
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      color: #a89f91;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    /* Title Styling */
+    h1.title {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem;
+      color: var(--navy);
+      font-weight: 600;
+      text-align: center;
+    }
+
+    h1.title span {
+      color: var(--orange);
+      font-style: italic;
+    }
+
+    /* Board Area for Cards */
+    #board {
+      position: relative;
+      width: 90%;
+      max-width: 1200px;
+      height: 70vh;
+      margin-top: 20px;
+    }
+
+    /* Floating Card */
+    .card {
+      position: absolute;
+      background: var(--card-bg);
+      border-radius: 6px;
+      padding: 20px;
+      width: 280px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(230, 220, 205, 0.6);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+      z-index: 10 !important;
+    }
+
+    .card .quote-icon {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: #f0c3a5;
+      line-height: 1;
+    }
+
+    .card-content {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      color: #2c3e50;
+      font-size: 1.05rem;
+      margin-bottom: 20px;
+      line-height: 1.4;
+      padding-right: 15px;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 4px;
+      background-color: #eee;
+      border: 1px solid #ddd;
+    }
+
+    .card-author {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--navy);
+    }
+
+    /* Bottom Right Action Button */
+    .btn-leave {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background-color: var(--navy);
+      color: #fff;
+      border: none;
+      padding: 14px 24px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(15, 36, 68, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 100;
+      transition: background-color 0.2s;
+    }
+
+    .btn-leave:hover {
+      background-color: #173561;
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 36, 68, 0.4);
+      backdrop-filter: blur(4px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 450px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .modal h2 {
+      font-family: 'Playfair Display', serif;
+      color: var(--navy);
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--navy);
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: inherit;
+      background: #faf8f5;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      height: 100px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn-cancel {
+      background: transparent;
+      border: 1px solid #ccc;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-submit {
+      background: var(--orange);
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-circle"></div>
+
+  <div class="container">
+    <div class="date-header">2 FEBRUARY 2025 — 8 AUGUST 2026</div>
+    <h1 class="title">Farewell, <span>MattieMirakel!</span></h1>
+
+    <!-- Area where floating message cards appear -->
+    <div id="board"></div>
+  </div>
+
+  <!-- Action Trigger -->
+  <button class="btn-leave" id="openModalBtn">
+    LEAVE A MESSAGE <span>+</span>
+  </button>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h2>Leave a Message</h2>
+      <form id="messageForm">
+        <div class="form-group">
+          <label for="author">Your Name / Username</label>
+          <input type="text" id="author" placeholder="XxHerbWasHerexX" required>
+        </div>
+        <div class="form-group">
+          <label for="content">Message</label>
+          <textarea id="content" placeholder="Wishing for a bright future!" required></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" id="closeModalBtn">Cancel</button>
+          <button type="submit" class="btn-submit">Save & Show Everyone</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const modalOverlay = document.getElementById('modalOverlay');
+    const openModalBtn = document.getElementById('openModalBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const messageForm = document.getElementById('messageForm');
+    const board = document.getElementById('board');
+
+    // Toggle Modal
+    openModalBtn.addEventListener('click', () => modalOverlay.classList.add('active'));
+    closeModalBtn.addEventListener('click', () => modalOverlay.classList.remove('active'));
+
+    // Fetch and render existing messages from the backend
+    async function loadMessages() {
+      try {
+        const res = await fetch('/api/messages');
+        const data = await res.json();
+        
+        board.innerHTML = '';
+        if (data.status === 'success') {
+          data.messages.forEach(msg => createCardElement(msg));
+        }
+      } catch (err) {
+        console.error("Error loading messages:", err);
+      }
+    }
+
+    // Append card to DOM
+    function createCardElement(msg) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.top = `${msg.top}%`;
+      card.style.left = `${msg.left}%`;
+
+      card.innerHTML = `
+        <div class="quote-icon">“</div>
+        <div class="card-content">${escapeHtml(msg.content)}</div>
+        <div class="card-footer">
+          <img src="${msg.avatar}" class="card-avatar" alt="avatar">
+          <span class="card-author">${escapeHtml(msg.author)}</span>
+        </div>
+      `;
+
+      board.appendChild(card);
+    }
+
+    // Helper to prevent XSS
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Handle submit & Save to server
+    messageForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const author = document.getElementById('author').value;
+      const content = document.getElementById('content').value;
+
+      try {
+        const res = await fetch('/api/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ author, content })
+        });
+
+        const data = await res.json();
+
+        if (data.status === 'success') {
+          createCardElement(data.message); // Append new card immediately
+          messageForm.reset();
+          modalOverlay.classList.remove('active');
+        }
+      } catch (err) {
+        console.error("Error posting message:", err);
+      }
+    });
+
+    // Initial Load
+    loadMessages();
+  </script>
+</body>
+</html>
