@@ -92,5 +92,5 @@ def add_message():
 if __name__ == '__main__':
     init_db()
     # Running on 0.0.0.0 makes the app accessible on your local network
-    # using your IP address (e.g., http://192.168.68.56:5001)
-    app.run(debug=True, port=5001, host='0.0.0.0')
+    # using your IP address (e.g., http://192.168.68.56:5000)
+    app.run(debug=True, port=5000, host='0.0.0.0')
