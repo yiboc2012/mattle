@@ -7,14 +7,14 @@
   <!-- Google Serif Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
     :root {
       --bg-color: #f7f2e9;
       --circle-color: rgba(240, 222, 203, 0.45);
       --navy: #0f2444;
-      --orange: #e86339;
+      --burnt-sienna: #E97451; /* New accent color */
       --card-bg: #fffcf8;
     }
 
@@ -26,7 +26,7 @@
 
     body {
       background-color: var(--bg-color);
-      font-family: 'Inter', sans-serif;
+      font-family: 'Source Sans Pro', sans-serif;
       min-height: 100vh;
       overflow-x: hidden;
       position: relative;
@@ -69,58 +69,60 @@
 
     /* Title Styling */
     h1.title {
-      font-family: 'Playfair Display', serif;
+      font-family: 'Lora', serif;
       font-size: 3.5rem;
       color: var(--navy);
-      font-weight: 600;
+      font-weight: 700;
       text-align: center;
     }
 
     h1.title span {
-      color: var(--orange);
+      color: var(--burnt-sienna);
       font-style: italic;
     }
 
     /* Board Area for Cards */
     #board {
-      position: relative;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Responsive grid columns */
+      gap: 20px; /* Spacing between cards */
       width: 90%;
       max-width: 1200px;
-      height: 70vh;
       margin-top: 20px;
+      padding: 20px; /* Add some padding around the board */
+      justify-content: center; /* Center grid items horizontally */
+      align-items: start; /* Align grid items to the start vertically */
+      min-height: 70vh; /* Ensure board takes up space, but allows content to expand */
     }
 
-    /* Floating Card */
+    /* Message Card */
     .card {
-      position: absolute;
       background: var(--card-bg);
       border-radius: 6px;
       padding: 20px;
-      width: 280px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
       border: 1px solid rgba(230, 220, 205, 0.6);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      cursor: pointer;
+      /* Removed absolute positioning */
     }
 
     .card:hover {
       transform: translateY(-4px);
       box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
-      z-index: 10 !important;
+      /* z-index: 10 !important; - No longer needed with grid layout */
     }
 
     .card .quote-icon {
       position: absolute;
       top: 10px;
       right: 15px;
-      font-family: 'Playfair Display', serif;
+      font-family: 'Lora', serif;
       font-size: 2rem;
       color: #f0c3a5;
       line-height: 1;
     }
 
     .card-content {
-      font-family: 'Playfair Display', serif;
+      font-family: 'Lora', serif;
       font-style: italic;
       color: #2c3e50;
       font-size: 1.05rem;
@@ -257,7 +259,7 @@
     }
 
     .btn-submit {
-      background: var(--orange);
+      background: var(--burnt-sienna);
       color: #fff;
       border: none;
       padding: 8px 16px;
@@ -291,11 +293,11 @@
       <form id="messageForm">
         <div class="form-group">
           <label for="author">Your Name / Username</label>
-          <input type="text" id="author" placeholder="XxHerbWasHerexX" required>
+          <input type="text" id="author" placeholder="kevinchenyibo4" required>
         </div>
         <div class="form-group">
           <label for="content">Message</label>
-          <textarea id="content" placeholder="Wishing for a bright future!" required></textarea>
+          <textarea id="content" placeholder="It was great working with you!" required></textarea>
         </div>
         <div class="modal-actions">
           <button type="button" class="btn-cancel" id="closeModalBtn">Cancel</button>
@@ -335,8 +337,9 @@
     function createCardElement(msg) {
       const card = document.createElement('div');
       card.className = 'card';
-      card.style.top = `${msg.top}%`;
-      card.style.left = `${msg.left}%`;
+      // Add a random rotation to each card for a more organic feel
+      const rotation = Math.random() * 5 - 2.5; // -2.5 to 2.5 degrees
+      card.style.transform = `rotate(${rotation}deg)`;
 
       card.innerHTML = `
         <div class="quote-icon">“</div>
@@ -373,13 +376,17 @@
 
         const data = await res.json();
 
-        if (data.status === 'success') {
+        if (res.ok && data.status === 'success') {
           createCardElement(data.message); // Append new card immediately
           messageForm.reset();
           modalOverlay.classList.remove('active');
+        } else {
+          // If the server returned an error (e.g., word filter), show it
+          alert(data.message || 'An unexpected error occurred.');
         }
       } catch (err) {
         console.error("Error posting message:", err);
+        alert('Could not connect to the server.');
       }
     });
 
